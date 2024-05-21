@@ -11,6 +11,8 @@ import (
 	"github.com/etherlabsio/healthcheck/v2"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
@@ -27,6 +29,11 @@ func init() {
 		CORSMiddleware(),
 		HelmetMiddleware(),
 	)
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("isUrl", isUrl)
+		v.RegisterValidation("isActiveEmail", isActiveEmail)
+	}
 
 	Server.GET("/health", gin.WrapH(healthz()))
 }

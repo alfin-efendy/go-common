@@ -11,11 +11,11 @@ import (
 )
 
 type Config struct {
-	App    App                  `mapstructure:"app"`
-	Log    Log                  `mapstructure:"log"`
-	Server Server               `mapstructure:"server"`
-	DB     map[string]*Database `mapstructure:"database"`
-	Otel   Otel                 `mapstructure:"otel"`
+	App    App      `mapstructure:"app"`
+	Log    Log      `mapstructure:"log"`
+	Server Server   `mapstructure:"server"`
+	DB     Database `mapstructure:"database"`
+	Otel   Otel     `mapstructure:"otel"`
 }
 
 var (
