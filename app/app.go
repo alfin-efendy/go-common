@@ -13,8 +13,7 @@ import (
 func init() {
 	ctx := context.Background()
 	configs.Load()
-	newLogger := logger.NewLogger()
-	newLogger.Init()
+	logger.NewLogger().Init()
 	otel.Init(ctx)
 	database.Init(ctx)
 }
