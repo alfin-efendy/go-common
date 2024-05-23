@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/alfin87aa/go-common/configs"
@@ -13,9 +14,10 @@ import (
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
 
-func (d *database) initSql(ctx context.Context) {
+func initSql(ctx context.Context) {
 	config := configs.Configs.DB.Sql
 	logLevel := log.GetLevel()
 
@@ -71,6 +73,11 @@ func (d *database) initSql(ctx context.Context) {
 		db, err := gorm.Open(dialector, &gorm.Config{
 			SkipDefaultTransaction: true,
 			Logger:                 logger.New(log.GetLogrus(), loggerConfig),
+			NamingStrategy: schema.NamingStrategy{
+				SingularTable: true,
+				NameReplacer:  strings.NewReplacer("-", "_", " ", "_"),
+				NoLowerCase:   false,
+			},
 		})
 
 		if err != nil {
@@ -94,20 +101,20 @@ func (d *database) initSql(ctx context.Context) {
 		dbSql.SetMaxIdleConns(dbConfig.PoolingConnection.MaxIdle)
 		dbSql.SetMaxOpenConns(dbConfig.PoolingConnection.MaxOpen)
 		dbSql.SetConnMaxLifetime(time.Duration(dbConfig.PoolingConnection.MaxLifetime) * time.Second)
+		db.Config.NamingStrategy = schema.NamingStrategy{}
 
 		restapi.AddChecker("sql-"+id, func(ctx context.Context) error {
 			return dbSql.Ping()
 		})
 
-		d.sqlManager[id] = db
+		sqlManager[id] = db
 	}
 }
 
-func (d *database) SqlConnection(ctx context.Context, id string) *gorm.DB {
-	if db, ok := d.sqlManager[id]; ok {
+func GetSqlClient(id string) *gorm.DB {
+	if db, ok := sqlManager[id]; ok {
 		return db
 	}
 
-	log.Fatalf(ctx, fmt.Errorf("sql database connection %s not found", id), "❌ Failed to get sql database connection")
 	return nil
 }

@@ -41,6 +41,12 @@ type logger struct {
 	log *logrus.Logger
 }
 
+func NewLogger() Logger {
+	return &logger{
+		log: logrus.New(),
+	}
+}
+
 var loggerInstance Logger
 
 const (

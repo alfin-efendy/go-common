@@ -9,11 +9,11 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
-func (d *database) initElasticsearch(ctx context.Context) {
+func initElasticsearch(ctx context.Context) {
 	config := configs.Configs.DB.ElasticSearch
 
 	var err error
-	ElasticClient, err = elasticsearch.NewClient(elasticsearch.Config{
+	elasticClient, err = elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: config.Address,
 		Username:  config.Username,
 		Password:  config.Password,
@@ -26,7 +26,11 @@ func (d *database) initElasticsearch(ctx context.Context) {
 	logger.Infoln(ctx, "✅ Elasticsearch client connected")
 
 	restapi.AddChecker("elasticsearch", func(ctx context.Context) error {
-		_, err := ElasticClient.Info()
+		_, err := elasticClient.Info()
 		return err
 	})
+}
+
+func GetElasticsearchClient() *elasticsearch.Client {
+	return elasticClient
 }

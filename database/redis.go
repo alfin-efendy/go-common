@@ -11,7 +11,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func (d *database) initRedis(ctx context.Context) {
+func initRedis(ctx context.Context) {
 	config := configs.Configs.DB.Redis
 
 	for id, redisConfig := range config {
@@ -37,7 +37,7 @@ func (d *database) initRedis(ctx context.Context) {
 			return nil
 		})
 
-		d.redisManager[id] = redisClient
+		redisManager[id] = redisClient
 	}
 }
 
@@ -153,11 +153,10 @@ func initSentinelMode(ctx context.Context, config *configs.Redis) *redis.Client 
 	return RedisClient
 }
 
-func (d *database) redisConnection(ctx context.Context, id string) redis.UniversalClient {
-	if client, ok := d.redisManager[id]; ok {
+func GetRedisClient(id string) *redis.Client {
+	if client, ok := redisManager[id]; ok {
 		return client
 	}
 
-	logger.Fatalf(ctx, fmt.Errorf("redis client %s not found", id), "❌ Failed to get redis client")
 	return nil
 }
